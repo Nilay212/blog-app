@@ -55,6 +55,7 @@ export const signin = async (req,res) => {
         res.status(200).json({
             _id : user._id,
             username : user.username,
+            email : user.email,
         })
         
     } catch (error) {

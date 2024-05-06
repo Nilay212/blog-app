@@ -63,3 +63,41 @@ export const signin = async (req,res) => {
         res.status(500).json({error : "Internal Server Error"});
     }
 }
+
+export const google = async (req,res) => {
+    const {email, name, googlePhotoUrl} = req.body;
+    try {
+        const user = await User.findOne({email});
+        if(!user) {
+            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(generatedPassword, salt);
+            let newUser = new User({
+                username : name.toLowerCase().split(' ').join('') + Math.random().toString(9).slice(-4),
+                email,
+                password : hashedPassword,
+                profilePicture : googlePhotoUrl
+            })
+            await newUser.save()
+            newUser = await User.findOne({email});
+            generateTokenAndSetCookie(newUser._id, res);
+            res.status(200).json({
+                _id : newUser._id,
+                username : newUser.username,
+                email : newUser.email,
+                photoUrl : newUser.photoUrl
+            })
+        } else {
+            generateTokenAndSetCookie(user._id, res);
+            res.status(200).json({
+                _id : user._id,
+                username : user.username,
+                email : user.email,
+                photoUrl : user.photoUrl
+            })
+        }
+    } catch (error) {
+        console.log("Error in google auth controller : ", error.message);
+        res.status(500).json({error : 'Internal Server Error'});
+    }
+}

@@ -50,7 +50,7 @@ export const signin = async (req,res) => {
         if(!user || !isPasswordCorrect) {
             return res.status(404).json({error : "Invalid Credentials"})
         }
-        generateTokenAndSetCookie(user._id, res);
+        generateTokenAndSetCookie(user._id, user.isAdmin, res);
 
         res.status(200).json({
             _id : user._id,
@@ -77,24 +77,27 @@ export const google = async (req,res) => {
                 username : name.toLowerCase().split(' ').join('') + Math.random().toString(9).slice(-4),
                 email,
                 password : hashedPassword,
-                profilePicture : googlePhotoUrl
+                profilePicture : googlePhotoUrl,
+                isAdmin : false
             })
             await newUser.save()
             newUser = await User.findOne({email});
-            generateTokenAndSetCookie(newUser._id, res);
+            generateTokenAndSetCookie(newUser._id, newUser.isAdmin, res);
             res.status(200).json({
                 _id : newUser._id,
                 username : newUser.username,
                 email : newUser.email,
-                photoUrl : newUser.photoUrl
+                profilePicture : newUser.profilePicture,
+                isAdmin : newUser.isAdmin
             })
         } else {
-            generateTokenAndSetCookie(user._id, res);
+            generateTokenAndSetCookie(user._id, user.isAdmin, res);
             res.status(200).json({
                 _id : user._id,
                 username : user.username,
                 email : user.email,
-                photoUrl : user.photoUrl
+                profilePicture : user.profilePicture,
+                isAdmin : user.isAdmin
             })
         }
     } catch (error) {

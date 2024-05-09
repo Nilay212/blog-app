@@ -56,6 +56,7 @@ export const signin = async (req,res) => {
             _id : user._id,
             username : user.username,
             email : user.email,
+            profilePicture : user.profilePicture, // iske wajah h profile pic nahi dikh raha tha
         })
         
     } catch (error) {

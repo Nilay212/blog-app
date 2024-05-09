@@ -57,3 +57,17 @@ export const updateUser = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+export const deleteUser = async (req,res) => {
+    if(req.user.userId !== req.params.userId) {
+        return res.status(400).json("You are not allowed to delete this user");
+    }
+    try {
+        await User.findByIdAndDelete(req.params.userId);
+        res.status(200).json({ message: "User deleted successfully" });
+        
+    } catch (error) {
+        console.log('Error in deleteUser controller : ', error.message);
+        res.status(500).json({error : "Internal server error"})
+    }
+}
